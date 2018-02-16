@@ -1,0 +1,40 @@
+{
+  "name": "men-at-auth",
+  "version": "1.0.0",
+  "description": "Handrolled Authentication with MongoDB, Express, and NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "watch:server": "NODE_ENV=development ./node_modules/.bin/nodemon index.js",
+    "dev": "npm run watch:server",
+    "lint": "./node_modules/.bin/eslint server.js index.js brandfile.js newrelic.js shared/** app/** public/src/** test/**.js",
+    "lint:fix": "./node_modules/.bin/eslint --fix server.js index.js brandfile.js newrelic.js shared/** app/** public/src/** test/**"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nabchar/MEN-at-auth.git"
+  },
+  "author": "Nick Char",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nabchar/MEN-at-auth/issues"
+  },
+  "homepage": "https://github.com/nabchar/MEN-at-auth#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "mongoose": "^5.0.5",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.6.1",
+    "nodemon": "^1.14.12"
+  }
+}
