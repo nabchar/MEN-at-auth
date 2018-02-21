@@ -4,15 +4,24 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 // import session from 'express-session';
+
+import DB_CONFIG from './models/config';
 import router from './routes/routes';
 
 
 // Set up MongoDB
-mongoose.connect('mongodb://localhost/auth-test');
+// add valid credentials to .env
+mongoose.connect(DB_CONFIG.uri, (error) => {
+  if (error) {
+    console.error('There was an Error connecting to DB', error);
+  }
+  console.log('Connected to Mlab');
+});
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-  console.log('DB Connected');
+  console.log('DB is alive and well');
 });
 
 // Initialize http server
@@ -27,7 +36,7 @@ app.use(bodyParser()); // get information from html forms
 app.use('/', router);
 
 // launch ***************************
-const server = app.listen(9000, () => {
+const server = app.listen(9000 || process.env.PORT, () => {
   const { address, port } = server.address();
   console.log(`Listening at http://${address}:${port}`);
 });
