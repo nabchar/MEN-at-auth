@@ -1,4 +1,5 @@
 import express from 'express';
+import userActions from '../controllers/users';
 
 // route middleware to make sure a user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -13,54 +14,42 @@ const isLoggedIn = (req, res, next) => {
 
 const router = express.Router();
 
-// =====================================
-// HOME PAGE (with login links) ========
-// =====================================
+// Homepage
 router.get('/', (req, res) => {
   res.send('Homepage'); // load the index.ejs file
 });
 
-// =====================================
-// LOGIN ===============================
-// =====================================
-// show the login form
+//
+// Login Routes
+//
 router.get('/login', (req, res) => {
-  // render the page and pass in any flash data if it exists
-  res.send('Login');
+  res.send('YOU ARE ON THE LOGIN PAGE');
 });
 
-// process the login form
-// router.post('/login', do all our passport stuff here);
+router.post('/login', (req, res) => {
+  userActions.logIn(req, res);
+});
 
-// =====================================
-// SIGNUP ==============================
-// =====================================
-// show the signup form
+//
+// Signup Routes
+//
 router.get('/signup', (req, res) => {
+  res.send('YOU ARE ON THE SIGNUP PAGE');
+});
+
+router.post('/signup', (req, res) => {
   // render the page and pass in any flash data if it exists
-  res.send('Signup');
+  userActions.signUp(req, res);
 });
 
-// process the signup form
-// router.post('/signup', do all our passport stuff here);
-
-// =====================================
-// PROFILE SECTION =====================
-// =====================================
-// we will want this protected so you have to be logged in to visit
-// we will use route middleware to verify this (the isLoggedIn )
+// Profile Route
 router.get('/profile', isLoggedIn, (req, res) => {
-  res.render('profile.ejs', {
-    user: req.user, // get the user out of session and pass to template
-  });
+  res.send('A protected user profile page');
 });
 
-// =====================================
-// LOGOUT ==============================
-// =====================================
+// Logout
 router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  userActions.logOut(req, res);
 });
 
 export default router;
