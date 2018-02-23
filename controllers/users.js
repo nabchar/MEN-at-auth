@@ -79,89 +79,30 @@ const logOut = (req, res) => {
 // =====================
 // User Update Password
 // =====================
-const updatePassword = (req, res) => {
-  console.log('Trying to log in user');
+const updateUserData = (req, res) => {
+  console.log('Trying to update user');
   console.log('Request is: ', req.body);
   console.log('Email is: ', req.body.email);
-  if (req.body.oldPassword && req.body.newPassword && req.body.email) {
-    User.findOne({ email: req.body.email }, (err, user) => {
+  const currentUser = req.session.passport.user;
+  const { newPassword, newFirstName, newLastName } = req.body;
+  if (newPassword || newFirstName || newLastName) {
+    User.findOne({ email: currentUser.email }, (err, user) => {
       if (err) {
         res.status(404).json(err);
       } else if (!user) {
         res.status(401).json({ error: 'User not found' });
-      } else if (authenticateUser(user, req.body.oldPassword)) {
-        user.setPassword(req.body.newPassword);
+      } else {
+        if (newPassword) { user.setPassword(newPassword); }
+        if (newFirstName || newLastName) { user.updateAttr(newFirstName, newLastName); }
         saveUser(res, user, 'Password Reset');
-      } else {
-        res.status(401).json({ error: 'Username or password is incorrect' });
       }
     });
-  } else {
-    res.status(400).json({ error: 'missing required field' });
   }
-  return res;
-};
-
-// =====================
-// User Update Password
-// =====================
-const updateAccountDetails = (req, res) => {
-  console.log('Trying to log in user');
-  console.log('Request is: ', req.body);
-  console.log('Email is: ', req.body.email);
-  const { newFirstName, newLastName } = req.body;
-  if ((newFirstName || newLastName) && req.body.email) {
-    User.findOne({ email: req.body.email }, (err, user) => {
-      if (err) {
-        res.status(404).json(err);
-      } else if (!user) {
-        res.status(401).json({ error: 'User not found' });
-      } else if (authenticateUser(user, req.body.oldPassword)) {
-        user.updateAttr(newFirstName, newLastName);
-        saveUser(res, user, 'Updated user account details');
-      } else {
-        res.status(401).json({ error: 'Username or password is incorrect' });
-      }
-    });
-  } else {
-    res.status(400).json({ error: 'missing required field' });
-  }
-  return res;
-};
-
-// =====================
-// User Update Password
-// =====================
-const getAccountDetails = (req, res) => {
-  console.log('Trying to log in user');
-  console.log('Request is: ', req.body);
-  console.log('Email is: ', req.body.email);
-  if (req.body.oldPassword && req.body.newPassword && req.body.email) {
-    User.findOne({ email: req.body.email }, (err, user) => {
-      if (err) {
-        res.status(404).json(err);
-      } else if (!user) {
-        res.status(401).json({ error: 'User not found' });
-      } else if (authenticateUser(user, req.body.oldPassword)) {
-        res.status(200).json({
-          session_token: user.session_token,
-          message: 'Password Reset',
-        });
-      } else {
-        res.status(401).json({ error: 'Username or password is incorrect' });
-      }
-    });
-  } else {
-    res.status(400).json({ error: 'missing required field' });
-  }
-  return res;
 };
 
 export default {
   signUp,
   logIn,
   logOut,
-  updatePassword,
-  updateAccountDetails,
-  getAccountDetails,
+  updateUserData,
 };

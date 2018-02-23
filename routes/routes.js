@@ -48,11 +48,26 @@ router.post('/signup', (req, res) => {
 });
 
 //
-// Profile Page Route
+// Profile Page Route // GET account details
 //
 router.get('/profile', requireLogin, (req, res) => {
   console.log('Going to profile page for: ', req.session.passport.user);
-  res.send(`A protected user profile page ${req.session.passport.user}`);
+  res.json({
+    message: `A protected user profile page ${req.session.passport.user}`,
+    accountDetails: {
+      firstName: req.session.passport.user.firstName,
+      lastName: req.session.passport.user.lastName,
+    },
+  });
+  res.send();
+});
+
+//
+// Update User Route -- Update Password or Account Details
+//
+router.patch('/profile', requireLogin, (req, res) => {
+  console.log('Updating User Info');
+  userActions.updateUserData(req, res);
 });
 
 //
@@ -63,5 +78,8 @@ router.post('/logout', requireLogin, (req, res) => {
   console.log('Logging out user');
   res.redirect('/login');
 });
+
+
+
 
 export default router;
