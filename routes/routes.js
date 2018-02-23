@@ -1,17 +1,6 @@
 import express from 'express';
 import userActions from '../controllers/users';
 
-// route middleware to make sure a user is logged in
-const isLoggedIn = (req, res, next) => {
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  // if they aren't redirect them to the home page
-  res.redirect('/');
-  return null;
-};
-
 const router = express.Router();
 
 // Homepage
@@ -42,8 +31,10 @@ router.post('/signup', (req, res) => {
   userActions.signUp(req, res);
 });
 
+// TODO create a function to ch
 // Profile Route
-router.get('/profile', isLoggedIn, (req, res) => {
+//
+router.get('/profile', (req, res) => {
   res.send('A protected user profile page');
 });
 
