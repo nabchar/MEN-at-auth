@@ -1,8 +1,10 @@
+import passport from '../utils/passport';
 import User from '../models/user';
 
 // =================
 // Helper Functions
 // =================
+
 
 // user authentication
 const authenticateUser = (user, password) => user.validatePassword(password);
@@ -24,15 +26,6 @@ const saveUser = function saveUser(res, user, successMessage) {
   });
 };
 
-const updateUser = function updateUser(firstName, lastName, user) {
-  if (firstName) {
-    user.firstName = firstName;
-  }
-
-  if (lastName) {
-    user.lastName = lastName;
-  }
-};
 
 // =====================
 // User Sign Up
@@ -67,22 +60,12 @@ const logIn = (req, res) => {
   console.log('Trying to log in user');
   console.log('Request is: ', req.body);
   console.log('Email is: ', req.body.email);
-  User.findOne({ email: req.body.email }, (err, user) => {
-    if (err) {
-      res.status(404).json(err);
-    } else if (!user) {
-      res.status(401).json({ error: 'User not found' });
-    } else if (authenticateUser(user, req.body.password)) {
-      user.resetSessionToken();
-      res.status(200).json({
-        session_token: user.session_token,
-        message: 'User logged in',
-      });
-    } else {
-      res.status(401).json({ error: 'Username or password is incorrect' });
-    }
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true,
   });
-  return res;
+  console.log('Response is: ', res);
 };
 
 // =====================

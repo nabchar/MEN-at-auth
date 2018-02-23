@@ -1,5 +1,5 @@
 import passport from 'passport';
-import { LocalStrategy } from 'passport-local';
+import { Strategy } from 'passport-local';
 import User from '../models/user';
 
 passport.serializeUser((user, done) => {
@@ -10,18 +10,26 @@ passport.serializeUser((user, done) => {
   }
 });
 
-passport.deseralizeUser((email, done) => {
-  User.findOne({ email })
-    .then(user => done(null, user))
-    .catch(done);
+passport.deserializeUser((email, done) => {
+  User.findOne({ email }, (err, user) => {
+    if (err) { return done(err); }
+    return done(null, user);
+  });
 });
 
-passport.use('lucie', new LocalStrategy({
+passport.use(new Strategy({
   usernameField: 'email',
   passwordField: 'password',
-  passReqToCallback: true,
-}, (req, email, password, done) => {
-  done();
+}, (username, password, done) => {
+  console.log('Trying to log in user');
+  console.log('Email is: ', username);
+  console.log('Password is: ', password);
+  User.findOne({ email: username }, (err, user) => {
+    if (err) { return done(err); }
+    if (!user) { return done(null, false); }
+    if (!user.validatePassword(password)) { return done(null, false); }
+    return done(null, user);
+  });
 }));
 
 

@@ -4,11 +4,13 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import passport from 'passport';
+import flash from 'connect-flash';
 
+import passport from './utils/passport';
 import DB_CONFIG from './models/config';
 import router from './routes/routes';
 import seedDatabase from './seed';
+import User from './models/user';
 
 
 // Set up MongoDB
@@ -33,17 +35,36 @@ db.once('open', () => {
 const app = express();
 
 // set up our express application
-app.use(morgan('combined')); // log every request to the console
-app.use(cookieParser()); // read cookies (needed for auth)
-app.use(bodyParser.json()); // get information from html forms
-app.use(bodyParser.urlencoded({ extended: true })); // get information from html forms
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'a wildly insecure secret',
-  resave: false,
-  saveUninitialized: false,
-}));
-app.use(passport.initialize());
-app.use(passport.session());
+app
+  .use(morgan('combined'))
+  .use(cookieParser())
+  .use(bodyParser.json())
+  .use(bodyParser.urlencoded({ extended: true }))
+  .use(flash())
+  .use(session({
+    secret: process.env.SESSION_SECRET || 'a wildly insecure secret',
+    resave: false,
+    saveUninitialized: false,
+  }))
+  .use(passport.initialize())
+  .use(passport.session())
+  .use((req, res, next) => {
+    if (req.session && req.session.user) {
+      User.findOne({ email: req.session.user.email }, (err, user) => {
+        if (user) {
+          req.user = user;
+          delete req.user.hashedPassword; // delete the password from the session
+          delete req.user.salt; // delete the password from the session
+          req.session.user = user; // refresh the session value
+          res.locals.user = user;
+        }
+        // finishing processing the middleware and run the route
+        next();
+      });
+    } else {
+      next();
+    }
+  });
 
 // routes ***************************
 app.use('/', router);

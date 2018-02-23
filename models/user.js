@@ -35,22 +35,6 @@ UserSchema.methods.validatePassword = function validatePassword(password) {
   return user.hashedPassword === hash;
 };
 
-
-// Reset and return session token
-UserSchema.methods.resetSessionToken = function resetSessionToken() {
-  const user = this;
-  user.session_token = crypto.randomBytes(16).toString('hex');
-  return user.session_token;
-};
-
-// prehook function to ensure user has session token
-UserSchema.methods.ensureSessionToken = function ensureSessionToken() {
-  const user = this;
-  if (!user.session_token) {
-    user.session_token = crypto.randomBytes(16).toString('hex');
-  }
-};
-
 UserSchema.methods.updateAttr = function updateAttr(firstName, lastName) {
   const user = this;
   if (firstName) {
@@ -60,14 +44,6 @@ UserSchema.methods.updateAttr = function updateAttr(firstName, lastName) {
     user.lastName = lastName;
   }
 };
-
-UserSchema.pre('save', function preSave(next) {
-  const user = this;
-
-  user.ensureSessionToken();
-  next();
-});
-
 
 const User = mongoose.model('User', UserSchema);
 export default User;
