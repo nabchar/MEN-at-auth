@@ -1,6 +1,7 @@
 import express from 'express';
 import userActions from '../controllers/users';
 import passport from '../utils/passport';
+import User from '../models/user';
 
 const router = express.Router();
 
@@ -11,6 +12,14 @@ const requireLogin = function requireLogin(req, res, next) {
   } else {
     next();
   }
+};
+
+const getCurrentUser = function getCurrentUser(email) {
+  console.log('Getting current user with email: ', email);
+  return User.findOne({ email }, (err, user) => {
+    if (err) { return err; }
+    return user;
+  });
 };
 
 // Homepage
@@ -52,14 +61,16 @@ router.post('/signup', (req, res) => {
 //
 router.get('/profile', requireLogin, (req, res) => {
   console.log('Going to profile page for: ', req.session.passport.user);
-  res.json({
-    message: `A protected user profile page ${req.session.passport.user}`,
-    accountDetails: {
-      firstName: req.session.passport.user.firstName,
-      lastName: req.session.passport.user.lastName,
-    },
+  getCurrentUser(req.session.passport.user).then((currentUser) => {
+    console.log('Current User is :', currentUser.firstName, currentUser.lastName);
+    res.json({
+      message: `A protected user profile page ${req.session.passport.user}`,
+      accountDetails: {
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+      },
+    });
   });
-  res.send();
 });
 
 //
@@ -78,8 +89,6 @@ router.post('/logout', requireLogin, (req, res) => {
   console.log('Logging out user');
   res.redirect('/login');
 });
-
-
 
 
 export default router;

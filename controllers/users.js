@@ -86,7 +86,7 @@ const updateUserData = (req, res) => {
   const currentUser = req.session.passport.user;
   const { newPassword, newFirstName, newLastName } = req.body;
   if (newPassword || newFirstName || newLastName) {
-    User.findOne({ email: currentUser.email }, (err, user) => {
+    User.findOne({ email: currentUser }, (err, user) => {
       if (err) {
         res.status(404).json(err);
       } else if (!user) {
