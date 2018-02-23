@@ -77,7 +77,7 @@ const logOut = (req, res) => {
 };
 
 // =====================
-// User Update Password
+// User Update Action
 // =====================
 const updateUserData = (req, res) => {
   console.log('Trying to update user');
